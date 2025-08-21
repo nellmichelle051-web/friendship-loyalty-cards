@@ -36,6 +36,15 @@
             .filled .stamp-image {
                 transform: scale(1);
             }
+            /* New animation for the stamp change */
+            .stamped-animation {
+                animation: pop 0.3s ease-in-out;
+            }
+            @keyframes pop {
+                0% { transform: scale(1); }
+                50% { transform: scale(1.2); }
+                100% { transform: scale(1); }
+            }
         </style>
     </head>
     <body class="p-4">
@@ -74,7 +83,6 @@
             const FRIEND_NAME = "Ettienne"; // Change this for each friend's file.
             
             // 4. PASTE YOUR IMAGE URLS HERE from Imgur or another hosting service.
-            // These are placeholders.
             const sadFaceImage = 'https://i.imgur.com/SIMyRHo.png';
             const happyFaceImage = 'https://i.imgur.com/vElprr1.png';
 
@@ -85,18 +93,18 @@
             const stampsCountEl = document.getElementById('stamps-count');
             const totalStampsEl = document.getElementById('total-stamps');
             const circlesContainer = document.getElementById('stamp-circles-container');
-
-            // Initial setup
-            totalStampsEl.textContent = TOTAL_STAMPS;
-            cardNameEl.textContent = FRIEND_NAME;
-
-            // Function to create a stamp image element
+            
+            /**
+             * Function to create a stamp image element.
+             * Adds a unique query parameter to the URL to prevent browser caching.
+             */
             function createStampImage(isFilled) {
                 const container = document.createElement('div');
                 container.className = `stamp-image-container ${isFilled ? 'filled' : ''}`;
 
                 const img = document.createElement('img');
-                img.src = isFilled ? happyFaceImage : sadFaceImage;
+                const timestamp = new Date().getTime();
+                img.src = isFilled ? `${happyFaceImage}?t=${timestamp}` : `${sadFaceImage}?t=${timestamp}`;
                 img.alt = isFilled ? 'Happy Face Stamp' : 'Sad Face Slot';
                 img.className = 'stamp-image';
 
@@ -104,21 +112,39 @@
                 return container;
             }
 
-            // Function to render the loyalty card visually
+            /**
+             * Function to render the loyalty card visually.
+             */
             function renderCard(stampsEarned) {
-                circlesContainer.innerHTML = ''; // Clear existing circles
-                
-                // Loop to add stamps
+                // Get the current stamp count from the text element before we change it
+                const previousStampCount = parseInt(stampsCountEl.textContent) || 0;
+
+                // Update the stamp counter text
+                stampsCountEl.textContent = stampsEarned;
+
+                // Re-render the stamp circles from scratch
+                circlesContainer.innerHTML = '';
                 for (let i = 0; i < TOTAL_STAMPS; i++) {
                     const isFilled = i < stampsEarned;
                     circlesContainer.appendChild(createStampImage(isFilled));
                 }
                 
-                // Update the stamp counter text
-                stampsCountEl.textContent = stampsEarned;
+                // Animate the new stamp if the count has increased
+                if (stampsEarned > previousStampCount) {
+                    const newStampIndex = stampsEarned - 1;
+                    const newStampContainer = circlesContainer.children[newStampIndex];
+                    if (newStampContainer) {
+                        newStampContainer.classList.add('stamped-animation');
+                        setTimeout(() => {
+                            newStampContainer.classList.remove('stamped-animation');
+                        }, 500);
+                    }
+                }
             }
             
-            // Function to fetch the stamp count from the Google Sheet
+            /**
+             * Function to fetch the stamp count from the Google Sheet.
+             */
             async function fetchStampCount() {
                 const query = encodeURIComponent(`SELECT count(B) WHERE B = '${FRIEND_NAME}'`);
                 const url = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json&tq=${query}`;
