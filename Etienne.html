@@ -65,9 +65,9 @@
 
     <script>
         // --- CONFIGURATION ---
-        const SHEET_ID = '1TwKoCPQuzcxN0DMhi9eC9aG9EOV8JtYWZnbFqT-FRkc'; // your Sheet ID
+        const SHEET_ID = '1TwKoCPQuzcxN0DMhi9eC9aG9EOV8JtYWZnbFqT-FRkc'; // your Google Sheet ID
         const TOTAL_STAMPS = 10; // total slots
-        const FRIEND_NAME = "Etienne"; // friend name
+        const FRIEND_NAME = "Etienne"; // must match exactly as in your sheet
         const sadFaceImage = 'https://i.imgur.com/SIMyRHo.png';
         const happyFaceImage = 'https://i.imgur.com/vElprr1.png';
 
@@ -86,52 +86,4 @@
             const container = document.createElement('div');
             container.className = `stamp-image-container ${isFilled ? 'filled' : ''}`;
 
-            const img = document.createElement('img');
-            img.src = isFilled ? happyFaceImage : sadFaceImage;
-            img.alt = isFilled ? 'Happy Face Stamp' : 'Sad Face Slot';
-            img.className = 'stamp-image';
-
-            container.appendChild(img);
-            return container;
-        }
-
-        // Render the card visually
-        function renderCard(stampsEarned) {
-            circlesContainer.innerHTML = ''; // Clear old slots
-            for (let i = 0; i < TOTAL_STAMPS; i++) {
-                const isFilled = i < stampsEarned;
-                circlesContainer.appendChild(createStampImage(isFilled));
-            }
-            stampsCountEl.textContent = stampsEarned;
-        }
-
-        // Fetch the stamp count from Google Sheets
-        async function fetchStampCount() {
-            const query = encodeURIComponent(`SELECT count(B) WHERE B = '${FRIEND_NAME}'`);
-            const url = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json&tq=${query}`;
-
-            try {
-                const response = await fetch(url);
-                const text = await response.text();
-
-                // Parse Google Visualization JSON
-                const jsonText = text.substring(text.indexOf('{'), text.lastIndexOf('}') + 1);
-                const data = JSON.parse(jsonText);
-
-                let stamps = 0;
-                if (data.table.rows.length > 0 && data.table.rows[0].c[0] !== null) {
-                    stamps = data.table.rows[0].c[0].v;
-                }
-
-                renderCard(stamps);
-            } catch (error) {
-                console.error("Error fetching stamp count:", error);
-                renderCard(0); // fallback
-            }
-        }
-
-        // Run on page load
-        document.addEventListener('DOMContentLoaded', fetchStampCount);
-
-        // Auto-refresh every 5 seconds
-        setInterv
+            const img = document.createElement('
