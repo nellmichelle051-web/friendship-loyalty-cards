@@ -1,143 +1,120 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Friendship Loyalty Card</title>
-    <!-- We're using Tailwind CSS for a clean, modern look without writing a lot of custom CSS. -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <style>
-        body {
-            font-family: 'Inter', sans-serif;
-            background-color: #f3f4f6;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-        }
-        .stamp-circle {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            border: 2px solid #6b7280;
-            background-color: transparent;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: background-color 0.5s ease-in-out;
-        }
-        .stamp-circle.filled {
-            background-color: #3b82f6; /* A nice blue color */
-            border-color: #3b82f6;
-        }
-        .stamp-icon {
-            color: white;
-            font-size: 1.5rem;
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Friendship Loyalty Card</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: #f3f4f6;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+    }
+    .stamp-circle {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      border: 2px solid #6b7280;
+      background-color: transparent;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+    }
+    .stamp-circle img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+  </style>
 </head>
 <body class="p-4">
 
-    <div class="bg-white rounded-2xl shadow-2xl p-8 w-full max-w-sm text-center">
-        <!-- Logo and Title -->
-        <div class="flex flex-col items-center">
-            <img src="https://i.imgur.com/2cwR3f5.jpeg"alt="Friendship Logo" class="rounded-full mb-4">
-            <h1 id="card-name" class="text-3xl font-bold text-gray-800 mb-2"></h1>
-            <p class="text-gray-500 mb-6">Your Friendship Loyalty Card</p>
-        </div>
-
-        <!-- Stamp Progress Section -->
-        <div class="flex justify-center items-center mb-6">
-            <div id="stamp-circles-container" class="flex flex-wrap justify-center gap-2">
-                <!-- Stamp circles will be added here by JavaScript -->
-            </div>
-        </div>
-
-        <!-- Progress Counter -->
-        <div class="text-lg font-semibold text-gray-700">
-            You have <span id="stamps-count">0</span> out of <span id="total-stamps">10</span> stamps!
-        </div>
-        
+  <div class="bg-white rounded-2xl shadow-2xl p-8 w-full max-w-sm text-center">
+    <!-- Logo and Title -->
+    <div class="flex flex-col items-center">
+      <img src="https://i.imgur.com/2cwR3f5.jpeg" alt="Friendship Logo" class="rounded-full mb-4">
+      <h1 id="card-name" class="text-3xl font-bold text-gray-800 mb-2"></h1>
+      <p class="text-gray-500 mb-6">Your Friendship Loyalty Card</p>
     </div>
 
-    <script>
-        // --- CONFIGURATION ---
-        // 1. **PASTE YOUR GOOGLE SHEET ID HERE**
-        // You can find this in the URL of your Google Sheet:
-        // https://docs.google.com/spreadsheets/d/<YOUR_SHEET_ID_HERE>/edit
-        const SHEET_ID = '1TwKoCPQuzcxN0DMhi9eC9aG9EOV8JtYWZnbFqT-FRkc';
+    <!-- Stamp Progress Section -->
+    <div class="flex justify-center items-center mb-6">
+      <div id="stamp-circles-container" class="flex flex-wrap justify-center gap-2">
+        <!-- Stamps will be added here by JavaScript -->
+      </div>
+    </div>
 
-        // 2. Set the total number of stamps required for a full card
-        const TOTAL_STAMPS = 10;
-        
-        // 3. Set the name of the friend this card belongs to.
-        // This is a placeholder; we'll get the name from the URL in the next step.
-        const FRIEND_NAME = "Tracy"; // You can change this for each friend's file.
+    <!-- Progress Counter -->
+    <div class="text-lg font-semibold text-gray-700">
+      You have <span id="stamps-count">0</span> out of <span id="total-stamps">10</span> stamps!
+    </div>
+  </div>
 
-        // --- DO NOT EDIT BELOW THIS LINE ---
+  <script>
+    // --- CONFIGURATION ---
+    const SHEET_ID = '1TwKoCPQuzcxN0DMhi9eC9aG9EOV8JtYWZnbFqT-FRkc'; // Your sheet ID
+    const TOTAL_STAMPS = 10;
+    const FRIEND_NAME = "Tracy"; // FIXED name
 
-        // HTML elements
-        const cardNameEl = document.getElementById('card-name');
-        const stampsCountEl = document.getElementById('stamps-count');
-        const totalStampsEl = document.getElementById('total-stamps');
-        const circlesContainer = document.getElementById('stamp-circles-container');
+    // Stamp images
+    const HAPPY_FACE = "https://i.imgur.com/vElprr1.png"; // replace with your happy face URL
+    const SAD_FACE   = "https://i.imgur.com/SIMyRHo.png"; // replace with your sad face URL
 
-        // Initial setup
-        totalStampsEl.textContent = TOTAL_STAMPS;
-        cardNameEl.textContent = FRIEND_NAME;
+    // HTML elements
+    const cardNameEl = document.getElementById('card-name');
+    const stampsCountEl = document.getElementById('stamps-count');
+    const totalStampsEl = document.getElementById('total-stamps');
+    const circlesContainer = document.getElementById('stamp-circles-container');
 
-        // Function to create a stamp circle HTML element
-        function createCircle(isFilled) {
-            const circle = document.createElement('div');
-            circle.className = `stamp-circle ${isFilled ? 'filled' : ''}`;
-            return circle;
-        }
+    // Initial setup
+    totalStampsEl.textContent = TOTAL_STAMPS;
+    cardNameEl.textContent = FRIEND_NAME;
 
-        // Function to render the loyalty card visually
-        function renderCard(stampsEarned) {
-            circlesContainer.innerHTML = ''; // Clear existing circles
-            
-            // Loop to add filled circles for stamps earned
-            for (let i = 0; i < stampsEarned; i++) {
-                circlesContainer.appendChild(createCircle(true));
-            }
-            
-            // Loop to add empty circles for stamps remaining
-            const stampsRemaining = TOTAL_STAMPS - stampsEarned;
-            for (let i = 0; i < stampsRemaining; i++) {
-                circlesContainer.appendChild(createCircle(false));
-            }
-            
-            // Update the stamp counter text
-            stampsCountEl.textContent = stampsEarned;
-        }
-        
-        // Function to fetch the stamp count from the Google Sheet
-        async function fetchStampCount() {
-            // This is a special URL format to fetch data from a Google Sheet as JSON
-            const query = encodeURIComponent(`SELECT count(B) WHERE B = '${FRIEND_NAME}'`);
-            const url = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json&tq=${query}`;
-            
-            try {
-                const response = await fetch(url);
-                const text = await response.text();
-                
-                // Parse the JSON data from the Google Sheet
-                const jsonText = text.substring(text.indexOf('{'), text.lastIndexOf('}') + 1);
-                const data = JSON.parse(jsonText);
-                
-                // Extract the count of stamps
-                const stamps = data.table.rows[0].c[0].v;
-                renderCard(stamps);
-            } catch (error) {
-                console.error("Error fetching stamp count:", error);
-                // In case of an error, show 0 stamps
-                renderCard(0);
-            }
-        }
+    // Function to create a stamp (happy or sad face)
+    function createStamp(isFilled) {
+      const circle = document.createElement('div');
+      circle.className = "stamp-circle";
+      const img = document.createElement('img');
+      img.src = isFilled ? HAPPY_FACE : SAD_FACE;
+      circle.appendChild(img);
+      return circle;
+    }
 
-        // Run the main function when the page loads
-        document.addEventListener('DOMContentLoaded', fetchStampCount);
-    </script>
+    // Function to render the loyalty card visually
+    function renderCard(stampsEarned) {
+      circlesContainer.innerHTML = ''; 
+      for (let i = 0; i < stampsEarned; i++) {
+        circlesContainer.appendChild(createStamp(true)); // Happy face
+      }
+      for (let i = stampsEarned; i < TOTAL_STAMPS; i++) {
+        circlesContainer.appendChild(createStamp(false)); // Sad face
+      }
+      stampsCountEl.textContent = stampsEarned;
+    }
+    
+    // Function to fetch the stamp count from the Google Sheet
+    async function fetchStampCount() {
+      const query = encodeURIComponent(`SELECT count(B) WHERE B = '${FRIEND_NAME}'`);
+      const url = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json&tq=${query}`;
+      try {
+        const response = await fetch(url);
+        const text = await response.text();
+        const jsonText = text.substring(text.indexOf('{'), text.lastIndexOf('}') + 1);
+        const data = JSON.parse(jsonText);
+        const stamps = data.table.rows[0].c[0].v;
+        renderCard(stamps);
+      } catch (error) {
+        console.error("Error fetching stamp count:", error);
+        renderCard(0);
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', fetchStampCount);
+  </script>
 </body>
 </html>
